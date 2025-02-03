@@ -1,5 +1,5 @@
 use alloy::{
-    network::{Network, TransactionBuilder},
+    network::{Network, TransactionBuilder as _},
     primitives::{b256, bytes, Address, Bytes, B256},
     providers::Provider,
 };
