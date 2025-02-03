@@ -1,7 +1,4 @@
-use alloy::{
-    hex,
-    primitives::{bytes, Address, Bytes},
-};
+use alloy::primitives::{bytes, Address, Bytes};
 
 const EIP1167_PREFIX: Bytes = bytes!("363d3d373d3d3d363d");
 const EIP1167_SUFFIX: Bytes = bytes!("57fd5bf3");
@@ -23,13 +20,12 @@ pub(crate) fn detect_eip1167_minimal_proxy(code: &Bytes) -> Option<Address> {
     let address_pos = EIP1167_PREFIX.len() + 1;
     let suffix = &code[address_pos + address_len + EIP1167_SUFFIX_OFFSET_FROM_ADDRESS_END..];
 
-    dbg!(&hex::encode(suffix));
     if !suffix.starts_with(&EIP1167_SUFFIX) {
         return None;
     }
 
     let address_hex = &code[address_pos..address_pos + address_len];
-    let address = Address::from_slice(address_hex);
+    let address = Address::left_padding_from(address_hex);
 
     Some(address)
 }

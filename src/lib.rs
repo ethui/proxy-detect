@@ -1,4 +1,5 @@
 mod eip1167;
+mod eip1967;
 mod error;
 
 use alloy::{network::Network, primitives::Address, providers::Provider};
@@ -7,6 +8,8 @@ use error::DetectProxyResult;
 #[derive(Debug, PartialEq)]
 pub enum ProxyType {
     Eip1167(Address),
+    Eip1967Direct(Address),
+    Eip1967Beacon(Address),
 }
 
 pub async fn detect_proxy<N, P: Provider<N>>(
@@ -22,6 +25,10 @@ where
         return Ok(Some(ProxyType::Eip1167(address)));
     }
 
+    if let Some(proxy_type) = eip1967::detect_eip1967_direct_proxy(address, provider).await? {
+        return Ok(Some(proxy_type));
+    }
+
     Ok(None)
 }
 
@@ -30,9 +37,8 @@ mod tests {
     use super::*;
     use alloy::{primitives::address, providers::ProviderBuilder, transports::http::reqwest::Url};
     use lazy_static::lazy_static;
+    use rstest::*;
 
-    const MAINNET_EIP1167_PROXY: Address = address!("0x6d5d9b6ec51c15f45bfa4c460502403351d5b999");
-    const MAINNET_EIP1167_IMPL: Address = address!("0x210fF9Ced719E9bf2444DbC3670BAC99342126fA");
     lazy_static! {
         static ref MAINNET_RPC: Url = Url::parse(
             &std::env::var("ETH_MAINNET_RPC").unwrap_or("https://eth.rpc.blxrbdn.com".to_string())
@@ -40,13 +46,19 @@ mod tests {
         .unwrap();
     }
 
+    #[rstest]
+    #[case::eip1167(address!("0x6d5d9b6ec51c15f45bfa4c460502403351d5b999"), ProxyType::Eip1167(address!("0x210fF9Ced719E9bf2444DbC3670BAC99342126fA")))]
+    #[case::eip1167_vanity(address!("0xa81043fd06D57D140f6ad8C2913DbE87fdecDd5F"), ProxyType::Eip1167(address!("0x0000000010fd301be3200e67978e3cc67c962f48")))]
+    #[case::eip1967_direct(address!("0xA7AeFeaD2F25972D80516628417ac46b3F2604Af"), ProxyType::Eip1967Direct(address!("0x4bd844f72a8edd323056130a86fc624d0dbcf5b0")))]
+    #[case::eip1967_direct(address!("0x8260b9eC6d472a34AD081297794d7Cc00181360a"), ProxyType::Eip1967Direct(address!("0xe4e4003afe3765aca8149a82fc064c0b125b9e5a")))]
+    #[case::eip1967_beacon(address!("0xDd4e2eb37268B047f55fC5cAf22837F9EC08A881"), ProxyType::Eip1967Beacon(address!("0xb3e0edda8c2aeabfdece18ad7ac1ea86eb7d583b")))]
+    #[case::eip1967_beacon(address!("0x114f1388fAB456c4bA31B1850b244Eedcd024136"), ProxyType::Eip1967Beacon(address!("0xbe86f647b167567525ccaafcd6f881f1ee558216")))]
     #[tokio::test]
-    async fn mainnet_eip1167() {
+    async fn mainnet(#[case] proxy: Address, #[case] impl_: ProxyType) {
         let provider = ProviderBuilder::new().on_http(MAINNET_RPC.clone());
-        let result = detect_proxy(MAINNET_EIP1167_PROXY, &provider)
-            .await
-            .unwrap();
 
-        assert_eq!(result, Some(ProxyType::Eip1167(MAINNET_EIP1167_IMPL)));
+        let result = detect_proxy(proxy, &provider).await.unwrap();
+
+        assert_eq!(result, Some(impl_));
     }
 }
