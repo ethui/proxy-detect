@@ -1,6 +1,8 @@
 mod eip1167;
 mod eip1967;
 mod error;
+mod openzeppelin;
+mod utils;
 
 use alloy::{network::Network, primitives::Address, providers::Provider};
 use error::DetectProxyResult;
@@ -34,7 +36,9 @@ where
         return Ok(Some(proxy_type));
     }
 
-    //if let Some(proxy_type) = eip1967::detect_open(address, provider).await? {
+    if let Some(address) = openzeppelin::detect_open_zeppelin_proxy(address, provider).await? {
+        return Ok(Some(ProxyType::OpenZeppelin(address)));
+    }
 
     Ok(None)
 }
@@ -60,6 +64,7 @@ mod tests {
     #[case::eip1967_direct(address!("0x8260b9eC6d472a34AD081297794d7Cc00181360a"), ProxyType::Eip1967Direct(address!("0xe4e4003afe3765aca8149a82fc064c0b125b9e5a")))]
     #[case::eip1967_beacon(address!("0xDd4e2eb37268B047f55fC5cAf22837F9EC08A881"), ProxyType::Eip1967Beacon(address!("0xe5c048792dcf2e4a56000c8b6a47f21df22752d1")))]
     #[case::eip1967_beacon(address!("0x114f1388fAB456c4bA31B1850b244Eedcd024136"), ProxyType::Eip1967Beacon(address!("0x0fa0fd98727c443dd5275774c44d27cff9d279ed")))]
+    #[case::openzeppelin(address!("0xC986c2d326c84752aF4cC842E033B9ae5D54ebbB"), ProxyType::OpenZeppelin(address!("0x0656368c4934e56071056da375d4a691d22161f8")))]
     #[tokio::test]
     async fn mainnet(#[case] proxy: Address, #[case] impl_: ProxyType) {
         let provider = ProviderBuilder::new().on_http(MAINNET_RPC.clone());
