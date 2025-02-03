@@ -10,6 +10,7 @@ pub enum ProxyType {
     Eip1167(Address),
     Eip1967Direct(Address),
     Eip1967Beacon(Address),
+    OpenZeppelin(Address),
 }
 
 pub async fn detect_proxy<N, P: Provider<N>>(
@@ -28,6 +29,12 @@ where
     if let Some(proxy_type) = eip1967::detect_eip1967_direct_proxy(address, provider).await? {
         return Ok(Some(proxy_type));
     }
+
+    if let Some(proxy_type) = eip1967::detect_eip1967_beacon_proxy(address, provider).await? {
+        return Ok(Some(proxy_type));
+    }
+
+    //if let Some(proxy_type) = eip1967::detect_open(address, provider).await? {
 
     Ok(None)
 }
@@ -51,8 +58,8 @@ mod tests {
     #[case::eip1167_vanity(address!("0xa81043fd06D57D140f6ad8C2913DbE87fdecDd5F"), ProxyType::Eip1167(address!("0x0000000010fd301be3200e67978e3cc67c962f48")))]
     #[case::eip1967_direct(address!("0xA7AeFeaD2F25972D80516628417ac46b3F2604Af"), ProxyType::Eip1967Direct(address!("0x4bd844f72a8edd323056130a86fc624d0dbcf5b0")))]
     #[case::eip1967_direct(address!("0x8260b9eC6d472a34AD081297794d7Cc00181360a"), ProxyType::Eip1967Direct(address!("0xe4e4003afe3765aca8149a82fc064c0b125b9e5a")))]
-    #[case::eip1967_beacon(address!("0xDd4e2eb37268B047f55fC5cAf22837F9EC08A881"), ProxyType::Eip1967Beacon(address!("0xb3e0edda8c2aeabfdece18ad7ac1ea86eb7d583b")))]
-    #[case::eip1967_beacon(address!("0x114f1388fAB456c4bA31B1850b244Eedcd024136"), ProxyType::Eip1967Beacon(address!("0xbe86f647b167567525ccaafcd6f881f1ee558216")))]
+    #[case::eip1967_beacon(address!("0xDd4e2eb37268B047f55fC5cAf22837F9EC08A881"), ProxyType::Eip1967Beacon(address!("0xe5c048792dcf2e4a56000c8b6a47f21df22752d1")))]
+    #[case::eip1967_beacon(address!("0x114f1388fAB456c4bA31B1850b244Eedcd024136"), ProxyType::Eip1967Beacon(address!("0x0fa0fd98727c443dd5275774c44d27cff9d279ed")))]
     #[tokio::test]
     async fn mainnet(#[case] proxy: Address, #[case] impl_: ProxyType) {
         let provider = ProviderBuilder::new().on_http(MAINNET_RPC.clone());
