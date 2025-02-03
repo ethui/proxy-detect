@@ -1,0 +1,10 @@
+[package]
+name = "ethui-proxy-detect"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+alloy = { version = "0.11.0", features = ["providers", "reqwest-rustls-tls"] }
+
+[dev-dependencies]
+tokio = { version = "1.43.0", features = ["rt-multi-thread"] }
