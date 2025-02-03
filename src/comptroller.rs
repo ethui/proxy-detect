@@ -6,14 +6,12 @@ use alloy::{
 
 use crate::{error::DetectProxyResult, utils::u256_to_address, ProxyType};
 
-const EIP_897_INTERFACE: [B256; 2] = [
-    // bytes4(keccak256("implementation()")) padded to 32 bytes
-    b256!("0x5c60da1b00000000000000000000000000000000000000000000000000000000"),
-    // bytes4(keccak256("proxyType()")) padded to 32 bytes
-    b256!("0x4555d5c900000000000000000000000000000000000000000000000000000000"),
+const COMPTROLLER_INTERFACE: [B256; 1] = [
+    // bytes4(keccak256("comptrollerImplementation()")) padded to 32 bytes
+    b256!("0xbb82aa5e00000000000000000000000000000000000000000000000000000000"),
 ];
 
-pub(crate) async fn detect_eip897_proxy<N, P: Provider<N>>(
+pub(crate) async fn detect_comptroller_proxy<N, P: Provider<N>>(
     address: Address,
     provider: P,
 ) -> DetectProxyResult<Option<ProxyType>>
@@ -22,11 +20,11 @@ where
 {
     let call_0 = <N as Network>::TransactionRequest::default()
         .with_to(address)
-        .with_input(EIP_897_INTERFACE[0]);
+        .with_input(COMPTROLLER_INTERFACE[0]);
 
     if let Ok(value) = provider.call(&call_0).await {
         let b256: B256 = B256::from_slice(&value);
-        return Ok(Some(ProxyType::Eip897(u256_to_address(b256.into()))));
+        return Ok(Some(ProxyType::Comptroller(u256_to_address(b256.into()))));
     };
 
     Ok(None)

@@ -1,3 +1,4 @@
+mod comptroller;
 mod eip1167;
 mod eip1967;
 mod eip897;
@@ -17,6 +18,7 @@ pub enum ProxyType {
     OpenZeppelin(Address),
     Eip897(Address),
     Safe(Address),
+    Comptroller(Address),
 }
 
 pub async fn detect_proxy<N, P: Provider<N>>(
@@ -26,10 +28,8 @@ pub async fn detect_proxy<N, P: Provider<N>>(
 where
     N: Network,
 {
-    let code = provider.get_code_at(address).await?;
-
-    if let Some(address) = eip1167::detect_eip1167_minimal_proxy(&code) {
-        return Ok(Some(ProxyType::Eip1167(address)));
+    if let Some(proxy_type) = eip1167::detect_eip1167_minimal_proxy(address, provider).await? {
+        return Ok(Some(proxy_type));
     }
 
     if let Some(proxy_type) = eip1967::detect_eip1967_direct_proxy(address, provider).await? {
@@ -40,16 +40,20 @@ where
         return Ok(Some(proxy_type));
     }
 
-    if let Some(address) = openzeppelin::detect_open_zeppelin_proxy(address, provider).await? {
-        return Ok(Some(ProxyType::OpenZeppelin(address)));
+    if let Some(proxy_type) = openzeppelin::detect_open_zeppelin_proxy(address, provider).await? {
+        return Ok(Some(proxy_type));
     }
 
-    if let Some(address) = eip897::detect_eip897_proxy(address, provider).await? {
-        return Ok(Some(ProxyType::Eip897(address)));
+    if let Some(proxy_type) = eip897::detect_eip897_proxy(address, provider).await? {
+        return Ok(Some(proxy_type));
     }
 
-    if let Some(address) = safe::detect_safe_proxy(address, provider).await? {
-        return Ok(Some(ProxyType::Safe(address)));
+    if let Some(proxy_type) = safe::detect_safe_proxy(address, provider).await? {
+        return Ok(Some(proxy_type));
+    }
+
+    if let Some(proxy_type) = comptroller::detect_comptroller_proxy(address, provider).await? {
+        return Ok(Some(proxy_type));
     }
 
     Ok(None)
@@ -79,6 +83,7 @@ mod tests {
     #[case::openzeppelin(address!("0xC986c2d326c84752aF4cC842E033B9ae5D54ebbB"), ProxyType::OpenZeppelin(address!("0x0656368c4934e56071056da375d4a691d22161f8")))]
     #[case::eip897(address!("0x8260b9eC6d472a34AD081297794d7Cc00181360a"), ProxyType::Eip1967Direct(address!("0xe4e4003afe3765aca8149a82fc064c0b125b9e5a")))]
     #[case::eip897(address!("0x0DA0C3e52C977Ed3cBc641fF02DD271c3ED55aFe"), ProxyType::Safe(address!("0xd9db270c1b5e3bd161e8c8503c55ceabee709552")))]
+    #[case::eip897(address!("0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"), ProxyType::Comptroller(address!("0xbafe01ff935c7305907c33bf824352ee5979b526")))]
     #[tokio::test]
     async fn mainnet(#[case] proxy: Address, #[case] impl_: ProxyType) {
         let provider = ProviderBuilder::new().on_http(MAINNET_RPC.clone());
