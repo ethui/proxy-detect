@@ -5,6 +5,8 @@ edition = "2021"
 
 [dependencies]
 alloy = { version = "0.11.0", features = ["providers", "reqwest-rustls-tls"] }
+lazy_static = "1.5.0"
+thiserror = "2.0.11"
 
 [dev-dependencies]
 tokio = { version = "1.43.0", features = ["rt-multi-thread"] }
