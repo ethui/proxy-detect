@@ -12,18 +12,18 @@ use crate::{
 
 // bytes32(uint256(keccak256('eip1967.proxy.implementation')) - 1)
 const EIP1967_LOGIC_SLOT: B256 =
-    b256!("0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc");
+    b256!("360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc");
 
 // bytes32(uint256(keccak256('eip1967.proxy.beacon')) - 1)
 const EIP1967_BEACON_SLOT: B256 =
-    b256!("0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50");
+    b256!("a3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50");
 
 const EIP1967_BEACON_METHODS: [Bytes; 2] = [
     // bytes4(keccak256("implementation()")) padded to 32 bytes
-    bytes!("0x5c60da1b00000000000000000000000000000000000000000000000000000000"),
+    bytes!("5c60da1b00000000000000000000000000000000000000000000000000000000"),
     // bytes4(keccak256("childImplementation()")) padded to 32 bytes
     // some implementations use this over the standard method name so that the beacon contract is not detected as an EIP-897 proxy itself
-    bytes!("0xda52571600000000000000000000000000000000000000000000000000000000"),
+    bytes!("da52571600000000000000000000000000000000000000000000000000000000"),
 ];
 
 pub(crate) async fn detect_eip1967_direct_proxy<N, P: Provider<N>>(

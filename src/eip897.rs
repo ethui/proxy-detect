@@ -8,9 +8,9 @@ use crate::{error::DetectProxyResult, utils::u256_to_address, ProxyType};
 
 const EIP_897_INTERFACE: [B256; 2] = [
     // bytes4(keccak256("implementation()")) padded to 32 bytes
-    b256!("0x5c60da1b00000000000000000000000000000000000000000000000000000000"),
+    b256!("5c60da1b00000000000000000000000000000000000000000000000000000000"),
     // bytes4(keccak256("proxyType()")) padded to 32 bytes
-    b256!("0x4555d5c900000000000000000000000000000000000000000000000000000000"),
+    b256!("4555d5c900000000000000000000000000000000000000000000000000000000"),
 ];
 
 pub(crate) async fn detect_eip897_proxy<N, P: Provider<N>>(

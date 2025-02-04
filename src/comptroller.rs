@@ -8,7 +8,7 @@ use crate::{error::DetectProxyResult, utils::u256_to_address, ProxyType};
 
 const COMPTROLLER_INTERFACE: [B256; 1] = [
     // bytes4(keccak256("comptrollerImplementation()")) padded to 32 bytes
-    b256!("0xbb82aa5e00000000000000000000000000000000000000000000000000000000"),
+    b256!("bb82aa5e00000000000000000000000000000000000000000000000000000000"),
 ];
 
 pub(crate) async fn detect_comptroller_proxy<N, P: Provider<N>>(
