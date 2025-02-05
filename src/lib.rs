@@ -2,7 +2,7 @@ mod comptroller;
 mod eip1167;
 mod eip1967;
 mod eip897;
-mod error;
+pub mod error;
 mod openzeppelin;
 mod safe;
 mod utils;
