@@ -30,4 +30,4 @@ jobs:
           components: clippy, rustfmt
 
       - run: cargo clippy --all -- -D clippy::all -D clippy::dbg_macro
-      - run: cargo nextest run
+      - run: cargo test
