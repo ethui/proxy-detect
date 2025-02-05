@@ -21,6 +21,20 @@ pub enum ProxyType {
     Comptroller(Address),
 }
 
+impl ProxyType {
+    pub fn implementation(&self) -> Address {
+        match self {
+            ProxyType::Eip1167(addr)
+            | ProxyType::Eip1967Direct(addr)
+            | ProxyType::Eip1967Beacon(addr)
+            | ProxyType::OpenZeppelin(addr)
+            | ProxyType::Eip897(addr)
+            | ProxyType::Safe(addr)
+            | ProxyType::Comptroller(addr) => *addr,
+        }
+    }
+}
+
 pub async fn detect_proxy<N, P: Provider<N>>(
     address: Address,
     provider: &P,
