@@ -33,7 +33,6 @@ where
         Err(e) if e.is_error_resp() => return Ok(None),
         Err(e) => return Err(e)?,
     };
-    dbg!(&value);
 
     match bytes_to_b256_fallible(value) {
         None => Ok(None),
