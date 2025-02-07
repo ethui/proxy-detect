@@ -106,4 +106,16 @@ mod tests {
 
         assert_eq!(result, Some(impl_));
     }
+
+    #[rstest]
+    #[case::usdc_impl(address!("0x43506849D7C04F9138D1A2050bbF3A0c054402dd"))]
+    #[case::dai(address!("0x6B175474E89094C44Da98b954EedeAC495271d0F"))]
+    #[tokio::test]
+    async fn not_proxy(#[case] proxy: Address) {
+        let provider = ProviderBuilder::new().on_http(MAINNET_RPC.clone());
+
+        let result = detect_proxy(proxy, &provider).await.unwrap();
+
+        assert_eq!(result, None);
+    }
 }

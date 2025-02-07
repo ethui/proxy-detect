@@ -4,7 +4,11 @@ use alloy::{
     providers::Provider,
 };
 
-use crate::{error::DetectProxyResult, utils::u256_to_address, ProxyType};
+use crate::{
+    error::DetectProxyResult,
+    utils::{bytes_to_b256_fallible, u256_to_address},
+    ProxyType,
+};
 
 const EIP_897_INTERFACE: [B256; 2] = [
     // bytes4(keccak256("implementation()")) padded to 32 bytes
@@ -24,10 +28,15 @@ where
         .with_to(address)
         .with_input(EIP_897_INTERFACE[0]);
 
-    if let Ok(value) = provider.call(&call_0).await {
-        let b256: B256 = B256::from_slice(&value);
-        return Ok(Some(ProxyType::Eip897(u256_to_address(b256.into()))));
+    let value = match provider.call(&call_0).await {
+        Ok(value) => value,
+        Err(e) if e.is_error_resp() => return Ok(None),
+        Err(e) => return Err(e)?,
     };
+    dbg!(&value);
 
-    Ok(None)
+    match bytes_to_b256_fallible(value) {
+        None => Ok(None),
+        Some(b256) => Ok(Some(ProxyType::Eip897(u256_to_address(b256.into())))),
+    }
 }
