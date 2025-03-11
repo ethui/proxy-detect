@@ -63,10 +63,10 @@ where
         .with_to(beacon)
         .with_input(EIP1967_BEACON_METHODS[1].clone());
 
-    if let Ok(value) = provider.call(&beacon_call_0).await {
+    if let Ok(value) = provider.call(beacon_call_0).await {
         let b256: B256 = B256::from_slice(&value);
         return Ok(Some(ProxyType::Eip1967Beacon(u256_to_address(b256.into()))));
-    } else if let Ok(value) = provider.call(&beacon_call_1).await {
+    } else if let Ok(value) = provider.call(beacon_call_1).await {
         let b256: B256 = B256::from_slice(&value);
         return Ok(Some(ProxyType::Eip1967Beacon(u256_to_address(b256.into()))));
     };

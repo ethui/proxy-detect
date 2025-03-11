@@ -26,7 +26,7 @@ where
         .with_to(address)
         .with_input(COMPTROLLER_INTERFACE[0]);
 
-    let value = match provider.call(&call_0).await {
+    let value = match provider.call(call_0).await {
         Ok(value) => value,
         Err(e) if e.is_error_resp() => return Ok(None),
         Err(e) => return Err(e)?,
