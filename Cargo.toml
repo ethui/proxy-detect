@@ -6,7 +6,7 @@ license-file = "./LICENSE"
 
 
 [dependencies]
-alloy = { version = "0.11.1", default-features = false, features = [
+alloy = { version = "0.12", default-features = false, features = [
   "providers",
   "reqwest-rustls-tls",
   "rpc",
@@ -15,6 +15,6 @@ alloy = { version = "0.11.1", default-features = false, features = [
 thiserror = "2"
 
 [dev-dependencies]
-rstest = "0.25.0"
-tokio = { version = "1.44.0", features = ["rt-multi-thread"] }
-lazy_static = "1.5.0"
+rstest = "0.25"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+lazy_static = "1.5"
