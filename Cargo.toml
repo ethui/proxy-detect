@@ -6,7 +6,7 @@ license-file = "./LICENSE"
 
 
 [dependencies]
-alloy = { version = "0.13", default-features = false, features = [
+alloy = { version = "0.14", default-features = false, features = [
   "providers",
   "reqwest-rustls-tls",
   "rpc",
