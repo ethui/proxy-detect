@@ -15,6 +15,6 @@ alloy = { version = "1.0", default-features = false, features = [
 thiserror = "2"
 
 [dev-dependencies]
-rstest = "0.25"
+rstest = "0.26"
 tokio = { version = "1", features = ["rt-multi-thread"] }
 lazy_static = "1.5"
